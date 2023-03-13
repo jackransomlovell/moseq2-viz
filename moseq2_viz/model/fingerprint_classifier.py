@@ -48,6 +48,9 @@ def create_fingerprint_dataframe(scalar_df, mean_df, stat_type='mean', n_bins=No
         range_dict ([dict]): dictionary that hold min max values of the features
     '''
 
+    # deep copy the dfs
+    scalar_df = scalar_df.copy()
+    mean_df = mean_df.copy()
     # rescale velocity to cm/s
     vel_cols = [c for c in scalars if 'velocity' in c]
     vel_cols_stats = [f'{c}_{stat_type}' for c in scalars if 'velocity' in c]

@@ -439,10 +439,18 @@ def get_syllable_slices(syllable, labels, label_uuids, index, trim_nans: bool = 
         match_idx = trim_idx[np.where(label_arr == syllable)[0]]
         breakpoints = np.where(np.diff(match_idx, axis=0) > 1)[0]
 
-        if len(breakpoints) < 1:
+        if len(match_idx) > 0 and len(breakpoints) < 1:
+            # CASE: if only one emission, breakpoints will be empty, since all diffs are 1
+            breakpoints = [(0, len(match_idx)-1)]
+
+        elif len(breakpoints) > 0:
+            # More than one emission in labels
+            breakpoints = zip(np.r_[0, breakpoints+1], np.r_[breakpoints, len(match_idx)-1])
+
+        else:
+            # Zero emissions found
             continue
 
-        breakpoints = zip(np.r_[0, breakpoints+1], np.r_[breakpoints, len(match_idx)-1])
         for i, j in breakpoints:
             # strike out movies that have missing frames
             if missing_frames is not None:
@@ -800,7 +808,7 @@ def parse_model_results(model_obj, restart_idx=0, resample_idx=-1,
     else:
         raise RuntimeError('Can only parse model paths saved using joblib that end with .p or .pz')
 
-    # a bunch of legacy loading
+    # legacy loading
     if isinstance(output_dict['labels'], list) and isinstance(output_dict['labels'][0], list):
         if np.ndim(output_dict['labels'][0][0]) == 2:
             output_dict['labels'] = [np.squeeze(tmp[resample_idx]) for tmp in output_dict['labels'][restart_idx]]
@@ -808,21 +816,24 @@ def parse_model_results(model_obj, restart_idx=0, resample_idx=-1,
             output_dict['labels'] = [np.squeeze(tmp) for tmp in output_dict['labels'][restart_idx]]
         else:
             raise RuntimeError('Could not parse model labels')
-
+    # legacy loading
     if isinstance(output_dict['metadata']['groups'], list):
         # Models generated with moseq2-model < v0.5.0 would store groups as a list
         # but since v0.5.0 groups is now a dict of {uuid: group}
         output_dict['metadata']['groups'] = dict(zip(output_dict['metadata']['uuids'], output_dict['metadata']['groups']))
-
+    # legacy loading
     if isinstance(output_dict['model_parameters'], list):
         output_dict['model_parameters'] = output_dict['model_parameters'][restart_idx]
 
     if sort_labels_by_usage:
         output_dict['labels'], sorting = relabel_by_usage(output_dict['labels'], count=count)
+        # reorder the ar matrix and sigma
         old_ar_mat = deepcopy(output_dict['model_parameters']['ar_mat'])
+        old_sig = deepcopy(output_dict['model_parameters']['sig'])
         old_nu = deepcopy(output_dict['model_parameters']['nu'])
         for i, sort_idx in enumerate(sorting):
             output_dict['model_parameters']['ar_mat'][i] = old_ar_mat[sort_idx]
+            output_dict['model_parameters']['sig'][i] = old_sig[sort_idx]
             if isinstance(output_dict['model_parameters']['nu'], list):
                 output_dict['model_parameters']['nu'][i] = old_nu[sort_idx]
 

@@ -311,7 +311,7 @@ def h5_filepath_from_sorted(sorted_index_entry: dict) -> str:
     return first(sorted_index_entry['path'])
 
 
-def recursive_find_h5s(root_dir=os.getcwd(),
+def recursive_find_h5s(root_dir=None,
                        ext='.h5',
                        yaml_string='{}.yaml'):
     '''
@@ -319,7 +319,7 @@ def recursive_find_h5s(root_dir=os.getcwd(),
 
     Parameters
     ----------
-    root_dir (str): path to directory containing h5
+    root_dir (str): path to directory containing h5, if None, searches the current working directory
     ext (str): extension to search for.
     yaml_string (str): yaml file format name.
 
@@ -329,6 +329,9 @@ def recursive_find_h5s(root_dir=os.getcwd(),
     dicts (list): list of paths to metadata files
     yamls (list): list of paths to yaml files
     '''
+
+    if root_dir is None:
+        root_dir = os.getcwd()
 
     def has_frames(h5f):
         '''Checks if the supplied h5 file has a frames key'''
@@ -342,7 +345,7 @@ def recursive_find_h5s(root_dir=os.getcwd(),
     yaml_exists = compose(exists, h5_to_yaml)
 
     # grab all files with ext = .h5
-    files = glob(f'**/*{ext}', recursive=True)
+    files = glob(os.path.join(root_dir, '**', f'*{ext}'), recursive=True)
     # keep h5s that have a yaml file associated with them
     to_keep = filter(yaml_exists, files)
     # keep h5s that have a frames key

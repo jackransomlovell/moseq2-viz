@@ -111,7 +111,7 @@ def clean_frames(frames, medfilter_space=None, gaussfilter_space=None,
 
     if tail_filter is not None:
         for i in range(frames.shape[0]):
-            mask = cv2.morphologyEx(out[i], cv2.MORPH_OPEN, tail_filter) > tail_threshold
+            mask = cv2.morphologyEx(out[i].astype('uint8'), cv2.MORPH_OPEN, tail_filter) > tail_threshold
             out[i] = out[i] * mask.astype(frames.dtype)
 
     if medfilter_space is not None and np.all(np.array(medfilter_space) > 0):
@@ -120,11 +120,11 @@ def clean_frames(frames, medfilter_space=None, gaussfilter_space=None,
                 if medfilt % 2 == 0:
                     warnings.warn(f'medfilter_space kernel must be odd. Reducing {medfilt} to {medfilt - 1}')
                     medfilt -= 1
-                out[i] = cv2.medianBlur(out[i], medfilt)
+                out[i] = cv2.medianBlur(out[i].astype('uint8'), medfilt)
 
     if gaussfilter_space is not None and np.all(np.array(gaussfilter_space) > 0):
         for i in range(frames.shape[0]):
-            out[i] = cv2.GaussianBlur(out[i], (21, 21),
+            out[i] = cv2.GaussianBlur(out[i].astype('uint8'), (21, 21),
                                       gaussfilter_space[0], gaussfilter_space[1])
 
     return out
@@ -253,7 +253,7 @@ def make_crowd_matrix(slices, nexamples=50, pad=30, raw_size=(512, 424), outmovi
                 centroid_y += raw_size[1] // 2
 
             angles = h5['scalars/angle'][idx_slice]
-            frames = clean_frames((h5[frame_path][idx_slice] / scale).astype('uint8'), **kwargs)
+            frames = clean_frames((h5[frame_path][idx_slice] / scale), **kwargs)
 
             # flip the mouse in the correct orientation if necessary
             if 'flips' in h5['metadata/extraction']:

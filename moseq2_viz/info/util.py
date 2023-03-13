@@ -133,7 +133,8 @@ def transition_entropy(labels, tm_smoothing=0, truncate_syllable=40, transition_
     entropies (list of np.ndarra): a list of transition entropies (either incoming or outgoing) for
         each mouse and syllable.
     '''
-
+    # hack
+    old_settings = np.seterr(divide='ignore', invalid='ignore')
 
     if transition_type not in ('incoming', 'outgoing'):
         raise ValueError('transition_type must be incoming or outgoing')
@@ -161,9 +162,11 @@ def transition_entropy(labels, tm_smoothing=0, truncate_syllable=40, transition_
             # normalize each row (outgoing syllables)
             tm = tm.T
         # if incoming, don't reshape the transition matrix
-        tm = tm / tm.sum(axis=0, keepdims=True)
+        tm = tm / (tm.sum(axis=0, keepdims=True)
         ent = -np.nansum(tm * np.log2(tm), axis=0)
         entropies.append(ent)
+
+    _ = np.seterr(**old_settings)
 
     return entropies
 

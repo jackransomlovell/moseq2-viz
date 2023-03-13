@@ -271,7 +271,7 @@ class TestScalarUtils(TestCase):
         dset = h5_to_dict(h5_filepath_from_sorted(files[uuids[0]]), path='scalars')
 
         # Get ROI shape to compute distance to center
-        roi = h5_to_dict(h5_filepath_from_sorted(files[uuids[0]]), path='metadata/extraction/roi')['roi'].shape
+        roi = h5_to_dict(h5_filepath_from_sorted(files[uuids[0]]), path='metadata/extraction/roi')['roi']
 
         centroid_x_px = dset['centroid_x_px']
         centroid_y_px = dset['centroid_y_px']
