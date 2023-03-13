@@ -131,8 +131,7 @@ def write_crowd_movies(sorted_index, config_data, ordering, labels, label_uuids,
     # Filtering parameters
     clean_params = {
         'gaussfilter_space': config_data['gaussfilter_space'],
-        'medfilter_space': config_data['medfilter_space'],
-        'frame_dtype':config_data['frame_dtype']
+        'medfilter_space': config_data['medfilter_space']
     }
 
     # Set crowd movie filename format based on whether syllables were relabeled
