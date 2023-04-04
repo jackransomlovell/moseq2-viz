@@ -135,6 +135,7 @@ def transition_entropy(labels, tm_smoothing=0, truncate_syllable=40, transition_
         each mouse and syllable.
     '''
 
+    old_settings = np.seterr(divide='ignore', invalid='ignore')
 
     if transition_type not in ('incoming', 'outgoing'):
         raise ValueError('transition_type must be incoming or outgoing')
