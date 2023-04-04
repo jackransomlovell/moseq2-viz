@@ -7,6 +7,7 @@ from moseq2_viz.model.trans_graph import get_transition_matrix
 from moseq2_viz.model.util import get_syllable_statistics, relabel_by_usage
 
 
+
 def entropy(labels, truncate_syllable=40, smoothing=1.0, relabel_by='usage'):
     '''
     Computes syllable usage entropy, base 2.
@@ -133,8 +134,7 @@ def transition_entropy(labels, tm_smoothing=0, truncate_syllable=40, transition_
     entropies (list of np.ndarra): a list of transition entropies (either incoming or outgoing) for
         each mouse and syllable.
     '''
-    # hack
-    old_settings = np.seterr(divide='ignore', invalid='ignore')
+
 
     if transition_type not in ('incoming', 'outgoing'):
         raise ValueError('transition_type must be incoming or outgoing')
