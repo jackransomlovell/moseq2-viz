@@ -162,7 +162,7 @@ def transition_entropy(labels, tm_smoothing=0, truncate_syllable=40, transition_
             # normalize each row (outgoing syllables)
             tm = tm.T
         # if incoming, don't reshape the transition matrix
-        tm = tm / (tm.sum(axis=0, keepdims=True)
+        tm = tm / tm.sum(axis=0, keepdims=True)
         ent = -np.nansum(tm * np.log2(tm), axis=0)
         entropies.append(ent)
 
